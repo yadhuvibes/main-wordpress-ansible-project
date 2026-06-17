@@ -2,6 +2,11 @@
 - hosts: wordpress
   become: yes
 
+  vars:
+    website_user: wordpressuser
+    website_name: myblog
+    website_root: /home/wordpressuser/myblog/public
+
   roles:
     - nginx
     - php

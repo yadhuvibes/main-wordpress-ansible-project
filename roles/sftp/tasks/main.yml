@@ -1,25 +1,25 @@
 ---
 - name: Create website user
-  user:
-    name: wordpressuser
+  ansible.builtin.user:
+    name: "{{ website_user }}"
     shell: /bin/bash
     create_home: yes
 
 - name: Create website directory
-  file:
-    path: /home/wordpressuser/myblog/public
+  ansible.builtin.file:
+    path: "{{ website_root }}"
     state: directory
-    owner: wordpressuser
-    group: wordpressuser
+    owner: "{{ website_user }}"
+    group: "{{ website_user }}"
     mode: '0755'
     recurse: yes
 
-- name: Create sample index page
-  copy:
-    dest: /home/wordpressuser/myblog/public/index.html
+- name: Create sample index.html
+  ansible.builtin.copy:
+    dest: "{{ website_root }}/index.html"
     content: |
-      <h1>Website Created by Ansible</h1>
-      <h2>Phase 4 Completed</h2>
-    owner: wordpressuser
-    group: wordpressuser
+      <h1>Welcome to My Blog</h1>
+      <h2>Provisioned using Ansible</h2>
+    owner: "{{ website_user }}"
+    group: "{{ website_user }}"
     mode: '0644'

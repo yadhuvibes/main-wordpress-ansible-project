@@ -1,0 +1,25 @@
+---
+- name: Create website user
+  user:
+    name: wordpressuser
+    shell: /bin/bash
+    create_home: yes
+
+- name: Create website directory
+  file:
+    path: /home/wordpressuser/myblog/public
+    state: directory
+    owner: wordpressuser
+    group: wordpressuser
+    mode: '0755'
+    recurse: yes
+
+- name: Create sample index page
+  copy:
+    dest: /home/wordpressuser/myblog/public/index.html
+    content: |
+      <h1>Website Created by Ansible</h1>
+      <h2>Phase 4 Completed</h2>
+    owner: wordpressuser
+    group: wordpressuser
+    mode: '0644'

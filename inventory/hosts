@@ -1,0 +1,2 @@
+[wordpress]
+172.31.39.234 ansible_user=ec2-user ansible_python_interpreter=/usr/bin/python3.9

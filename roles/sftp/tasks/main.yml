@@ -12,7 +12,7 @@
     owner: "{{ website_user }}"
     group: "{{ website_user }}"
     mode: '0755'
-    recurse: yes
+    
 
 - name: Set ownership for home directory
   ansible.builtin.file:
@@ -22,15 +22,16 @@
     group: "{{ website_user }}"
 
 - name: Configure SSH for SFTP only access
-  ansible.builtin.lineinfile:
+  ansible.builtin.blockinfile:
     path: /etc/ssh/sshd_config
-    line: |
+    marker: "# {mark} ANSIBLE MANAGED SFTP BLOCK"
+    block: |
       Match User {{ website_user }}
           ForceCommand internal-sftp
           ChrootDirectory /home/{{ website_user }}
           AllowTcpForwarding no
           X11Forwarding no
-    state: present
+  notify: restart sshd
 
 - name: Restart SSH service
   ansible.builtin.service:

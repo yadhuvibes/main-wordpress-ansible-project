@@ -1,0 +1,29 @@
+- name: Ensure WordPress directory exists
+  ansible.builtin.file:
+    path: "{{ website_root }}"
+    state: directory
+    owner: "{{ website_user }}"
+    group: "{{ website_user }}"
+    mode: '0755'
+
+- name: Download WordPress only if not exists
+  ansible.builtin.unarchive:
+    src: https://wordpress.org/latest.tar.gz
+    dest: "{{ website_root }}"
+    remote_src: yes
+    creates: "{{ website_root }}/wp-config-sample.php"
+
+- name: Create wp-config.php from sample (only if not exists)
+  ansible.builtin.copy:
+    src: "{{ website_root }}/wp-config-sample.php"
+    dest: "{{ website_root }}/wp-config.php"
+    remote_src: yes
+    force: no
+
+- name: Set correct ownership for WordPress files
+  ansible.builtin.file:
+    path: "{{ website_root }}"
+    state: directory
+    recurse: yes
+    owner: "{{ website_user }}"
+    group: "{{ website_user }}"

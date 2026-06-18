@@ -18,4 +18,5 @@
   template:
     src: site.conf.j2
     dest: /etc/nginx/conf.d/site.conf
-  notify: Restart Nginx    
+    backup: yes
+  notify: reload nginx    

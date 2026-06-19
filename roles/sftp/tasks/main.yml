@@ -5,6 +5,14 @@
     shell: /sbin/nologin
     create_home: yes
 
+- name: Set chroot directory ownership (required for SFTP)
+  ansible.builtin.file:
+    path: "/home/{{ website_user }}"
+    state: directory
+    owner: root
+    group: root
+    mode: '0755'
+
 - name: Create website directory structure
   ansible.builtin.file:
     path: "{{ website_root }}"
@@ -12,14 +20,22 @@
     owner: "{{ website_user }}"
     group: "{{ website_user }}"
     mode: '0755'
-    
 
-- name: Set ownership for home directory
+- name: Create .ssh directory
   ansible.builtin.file:
-    path: "/home/{{ website_user }}"
+    path: "/home/{{ website_user }}/.ssh"
     state: directory
     owner: "{{ website_user }}"
     group: "{{ website_user }}"
+    mode: '0700'
+
+- name: Add authorized_keys
+  ansible.builtin.copy:
+    src: authorized_keys
+    dest: "/home/{{ website_user }}/.ssh/authorized_keys"
+    owner: "{{ website_user }}"
+    group: "{{ website_user }}"
+    mode: '0600'
 
 - name: Configure SSH for SFTP only access
   ansible.builtin.blockinfile:
@@ -32,8 +48,3 @@
           AllowTcpForwarding no
           X11Forwarding no
   notify: restart sshd
-
-- name: Restart SSH service
-  ansible.builtin.service:
-    name: sshd
-    state: restarted

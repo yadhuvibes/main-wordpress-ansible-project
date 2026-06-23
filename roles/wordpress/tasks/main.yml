@@ -1,29 +1,54 @@
-- name: Ensure WordPress directory exists
-  ansible.builtin.file:
+---
+- name: Create website user
+  ansible.builtin.user:
+    name: "{{ website_user }}"
+    state: present
+    create_home: yes
+
+- name: Create website root
+  file:
     path: "{{ website_root }}"
     state: directory
     owner: "{{ website_user }}"
     group: "{{ website_user }}"
-    mode: '0755'
+    mode: "0755"
 
-- name: Download WordPress only if not exists
-  ansible.builtin.unarchive:
+- name: Download WordPress
+  unarchive:
     src: https://wordpress.org/latest.tar.gz
-    dest: "{{ website_root }}"
+    dest: /tmp
     remote_src: yes
-    creates: "{{ website_root }}/wp-config-sample.php"
 
-- name: Create wp-config.php from sample (only if not exists)
-  ansible.builtin.copy:
-    src: "{{ website_root }}/wp-config-sample.php"
-    dest: "{{ website_root }}/wp-config.php"
-    remote_src: yes
-    force: no
+- name: Copy WordPress files
+  shell: cp -r /tmp/wordpress/* {{ website_root }}/
 
-- name: Set correct ownership for WordPress files
-  ansible.builtin.file:
+- name: Fix permissions
+  file:
     path: "{{ website_root }}"
     state: directory
     recurse: yes
     owner: "{{ website_user }}"
     group: "{{ website_user }}"
+
+- name: Create wp-config
+  template:
+    src: wp-config.php.j2
+    dest: "{{ website_root }}/wp-config.php"
+
+- name: Download WP CLI
+  get_url:
+    url: https://raw.githubusercontent.com/wp-cli/builds/gh-pages/phar/wp-cli.phar
+    dest: /usr/local/bin/wp
+    mode: '0755'
+
+- name: Install WordPress admin user
+  command: >
+    wp core install
+    --url=https://yadhurd.xyz
+    --title="{{ wp_site_title }}"
+    --admin_user="{{ wp_admin_user }}"
+    --admin_password="{{ wp_admin_password }}"
+    --admin_email="{{ wp_admin_email }}"
+    --allow-root
+  args:
+    chdir: "{{ website_root }}"

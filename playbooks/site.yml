@@ -2,13 +2,14 @@
 - hosts: wordpress
   become: yes
 
-  vars:
-    website_user: wordpressuser
-    website_name: myblog
-    website_root: /home/wordpressuser/myblog/public
+  vars_files:
+    - ../group_vars/all.yml
 
   roles:
-    - nginx
-    - php
     - mysql
+    - php
+    - wordpress
+    - phpmyadmin
+    - nginx
+    - ssl
     - sftp

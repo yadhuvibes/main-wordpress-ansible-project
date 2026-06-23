@@ -4,19 +4,19 @@
     name: nginx
     state: present
 
-- name: Enable Nginx
+- name: Deploy nginx config
+  template:
+    src: site.conf.j2
+    dest: /etc/nginx/conf.d/site.conf
+    force: yes
+  notify: reload nginx
+
+- name: Enable nginx
   service:
     name: nginx
     enabled: yes
 
-- name: Start Nginx
+- name: Start nginx
   service:
     name: nginx
     state: started
-
-- name: Deploy nginx site config
-  template:
-    src: site.conf.j2
-    dest: /etc/nginx/conf.d/site.conf
-    backup: yes
-  notify: reload nginx    

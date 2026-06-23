@@ -1,0 +1,25 @@
+
+---
+- name: Install Certbot
+  dnf:
+    name: certbot
+    state: present
+
+- name: Generate SSL certificate
+  command: >
+    certbot certonly
+    --webroot
+    -w /home/wordpressuser/myblog/public
+    -d yadhurd.xyz
+    -d www.yadhurd.xyz
+    --non-interactive
+    --agree-tos
+    --email admin@yadhurd.xyz
+  args:
+    creates: /etc/letsencrypt/live/yadhurd.xyz/fullchain.pem
+
+- name: Enable Certbot renewal timer
+  service:
+    name: certbot-renew.timer
+    enabled: yes
+    state: started

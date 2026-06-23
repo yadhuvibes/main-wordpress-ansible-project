@@ -1,0 +1,7 @@
+
+
+wordpress_db: wordpress
+
+wordpress_db_user: wpuser
+
+wordpress_db_password: Wp@123

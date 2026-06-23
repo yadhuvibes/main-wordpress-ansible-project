@@ -1,0 +1,35 @@
+---
+- name: Install unzip
+  dnf:
+    name: unzip
+    state: present
+
+- name: Download phpMyAdmin
+  get_url:
+    url: https://files.phpmyadmin.net/phpMyAdmin/5.2.2/phpMyAdmin-5.2.2-all-languages.zip
+    dest: /tmp/phpmyadmin.zip
+
+- name: Extract phpMyAdmin
+  unarchive:
+    src: /tmp/phpmyadmin.zip
+    dest: /usr/share/
+    remote_src: yes
+    creates: /usr/share/phpMyAdmin-5.2.2-all-languages
+
+- name: Create symlink
+  file:
+    src: /usr/share/phpMyAdmin-5.2.2-all-languages
+    dest: /usr/share/phpmyadmin
+    state: link
+
+- name: Create config file
+  copy:
+    dest: /usr/share/phpmyadmin/config.inc.php
+    content: |
+      <?php
+      $cfg['blowfish_secret'] = 'abcdefghijklmnop123456789';
+      $i = 1;
+      $cfg['Servers'][$i]['auth_type'] = 'cookie';
+      $cfg['Servers'][$i]['host'] = 'localhost';
+      $cfg['Servers'][$i]['compress'] = false;
+      $cfg['Servers'][$i]['AllowNoPassword'] = false;
